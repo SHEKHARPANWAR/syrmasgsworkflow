@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alert Ticker</title>
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Theme Variables & Layout Reset */
+    :root {
+      --danger: #ef4444;
+      --cyan: #06b6d4;
+      --success: #22c55e;
+      --warning: #eab308;
+      --neon: #10b981;
+      --muted-foreground: #a1a1aa;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    body {
+      background-color: #09090b; /* Dark theme baseline */
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Glass Container */
+    .alert-ticker-container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+      border-radius: 12px;
+      padding: 10px 16px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    /* Live Feed Badge */
+    .live-feed {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--danger);
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .live-text {
+      color: var(--cyan);
+    }
+
+    /* Ticker Track and Animation */
+    .ticker-viewport {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 40px; /* gap-10 */
+      white-space: nowrap;
+      animation: scroll-ticker 25s linear infinite;
+    }
+
+    /* Pause ticker on hover */
+    .ticker-viewport:hover .ticker-track {
+      animation-play-state: paused;
+    }
+
+    /* Individual Ticker Item */
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .ticker-icon {
+      width: 14px;  /* size-3.5 */
+      height: 14px;
+    }
+
+    .ticker-text {
+      color: var(--muted-foreground);
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .5; }
+    }
+
+    @keyframes scroll-ticker {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        /* Translates exactly halfway because the dataset is duplicated */
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="alert-ticker-container">
+    <div class="live-feed">
+      <span class="live-dot"></span>
+      <span class="live-text">LIVE FEED</span>
+    </div>
+
+    <div class="ticker-viewport">
+      <div class="ticker-track" id="ticker-track">
+        </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. Data definition mirroring your React array
+    const items = [
+      { icon: "alert-triangle", color: "var(--danger)",  text: "WO-2452-B stuck at BLT for 47m — bottleneck risk" },
+      { icon: "bot",            color: "var(--cyan)",    text: "AI predicts SMT capacity breach in 35m at current pace" },
+      { icon: "radio",          color: "var(--success)", text: "WO-2455-E fully shipped · 2,000 boards · 0 defects" },
+      { icon: "zap",            color: "var(--warning)", text: "FATP idle manpower 6 — recommended shift to MI" },
+      { icon: "alert-triangle", color: "var(--danger)",  text: "WO-2457-G delay > SLA · WhatsApp alert dispatched to Plant Head" },
+      { icon: "bot",            color: "var(--neon)",    text: "Shift A throughput +12.4% vs Shift B baseline" }
+    ];
+
+    // 2. Duplicate the items list to create the seamless infinite loop layout
+    const doubleItems = [...items, ...items];
+    const track = document.getElementById("ticker-track");
+
+    // 3. Generate HTML strings for the items
+    track.innerHTML = doubleItems.map(item => `
+      <div class="ticker-item">
+        <i data-lucide="${item.icon}" class="ticker-icon" style="color: ${item.color}"></i>
+        <span class="ticker-text">${item.text}</span>
+      </div>
+    `).join('');
+
+    // 4. Initialize Lucide to replace <i> elements with native SVGs
+    lucide.createIcons();
+  </script>
+
+</body>
+</html>
